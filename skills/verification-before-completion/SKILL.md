@@ -69,6 +69,16 @@ These phrases mean you haven't verified:
 | "Partial check is enough" | Partial proves nothing |
 | "Just this once" | "Just this once" is how every bad incident report starts |
 
+## Deploy checks (before pushing to production)
+
+A deploy is a verification claim with bigger blast radius. Before any `git push` to a branch that auto-deploys, OR before clicking "Deploy" anywhere:
+
+1. **Build locally.** `npm run build` (or your equivalent) → exit 0. Read the output. Production builds catch things dev mode hides — unused imports, type errors marked as warnings in dev, env vars that aren't defined.
+2. **Run the secret scan.** If `skills/secret-scan/SKILL.md` exists, fire it on the staged diff. A leaked key in a public push lives forever in git history.
+3. **Check `.env` discipline.** Are env vars referenced in code also set on the production host (Vercel dashboard, etc.)? `.env.local` doesn't ship.
+4. **Smoke-test the change.** Open the page you changed in dev. Click the thing. Confirm it works.
+5. **Then push.** And after the hosting platform reports "deploy ready," curl the live URL or open it in a browser to confirm.
+
 ## When NOT to use
 
 - Pure exploration / reading code — no claim being made.
